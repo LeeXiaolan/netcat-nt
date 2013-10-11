@@ -205,6 +205,7 @@ USHORT o_udpmode = 0;
 USHORT o_verbose = 0;
 unsigned int o_wait = 0;
 USHORT o_zero = 0;
+USHORT o_crlf = 0;
 
 /* Debug macro: squirt whatever to stderr and sleep a bit so we can see it go
    by.  need to call like Debug ((stuff)) [with no ; ] so macro args match!
@@ -1554,7 +1555,7 @@ Debug (("got %d from the net, errno %d", rr, errno))
 		if (kbhit()) {
 /*			bigbuf_in[0] = getche(); */
 			gets(bigbuf_in);
-		  	strcat(bigbuf_in, "\n");
+			strcat(bigbuf_in, o_crlf ? "\r\n" : "\n");
 			rr = strlen(bigbuf_in);
 			rzleft = rr;
 			zp = bigbuf_in;
@@ -1755,7 +1756,7 @@ recycle:
 
 /* If your shitbox doesn't have getopt, step into the nineties already. */
 /* optarg, optind = next-argv-component [i.e. flag arg]; optopt = last-char */
-   while ((x = getopt (argc, argv, "ade:g:G:hi:lLno:p:rs:tuvw:z")) != EOF) {
+   while ((x = getopt (argc, argv, "ade:g:G:hi:lLno:p:rs:tuvw:zC")) != EOF) {
 /* Debug (("in go: x now %c, optarg %x optind %d", x, optarg, optind)) */
     switch (x) {
       case 'a':
@@ -1849,6 +1850,9 @@ recycle:
 	break;
       case 'z':				/* little or no data xfer */
 	o_zero++;
+	break;
+      case 'C':				/* send CRLF as line-ending  */
+	o_crlf++;
 	break;
       default:
 	errno = 0;
@@ -2077,6 +2081,8 @@ options:");
 	-v		verbose [use twice to be more verbose]\n\
 	-w secs		timeout for connects and final net reads\n\
 	-z		zero-I/O mode [used for scanning]");
+  holler ("\
+	-C		send CRLF as line-ending");
   bail ("port numbers can be individual or ranges: m-n [inclusive]");
   return(0);
 } /* helpme */
