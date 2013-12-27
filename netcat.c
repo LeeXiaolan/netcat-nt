@@ -1571,6 +1571,7 @@ Debug (("got %d from the net, errno %d", rr, errno))
 		rr = read (0, bigbuf_in, BIGSIZ);
 		if (rr <= 0) {			/* at end, or fukt, or ... */
 			close (0);
+			shutdown(fd, /*SD_SEND*/0x01);
 		} else {
 			rzleft = rr;
 			zp = bigbuf_in;
